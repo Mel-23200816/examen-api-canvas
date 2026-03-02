@@ -1,216 +1,186 @@
 /**
- * main.js
- * Reproducción de la imagen 'paisaje-marino' en API Canvas
- * para el Examen API Canvas.
+       * @file main.js
+       * @description Recreación de paisaje marino minimalista mediante API Canvas.
+       * @author Miguel Angel Cano Alejandro
+       * @carrera Ingeniería en Sistemas Computacionales
+       * @noControl 23200816
+       * @institucion Instituto Tecnológico de Pachuca
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Configuración Inicial del Canvas
-    const canvas = document.getElementById('miCanvas');
-    const ctx = canvas.getContext('2d');
-    const contenedor = document.getElementById('contenedor-canvas');
+      const canvas = document.getElementById('miCanvas');
+      const ctx = canvas.getContext('2d');
+      const contenedor = document.getElementById('contenedor-canvas');
 
-    // Función para ajustar el tamaño del canvas al contenedor
-    function redimensionarCanvas() {
-        // Obtenemos las dimensiones del contenedor (Bootstrap)
-        const ancho = contenedor.clientWidth;
-        const alto = contenedor.clientHeight;
+      // Contador para verificar el uso de figuras básicas (> 30)
+      let totalFiguras = 0;
 
-        // Establecemos la resolución interna del canvas
-        canvas.width = ancho;
-        canvas.height = alto;
+      function redimensionarCanvas() {
+            canvas.width = contenedor.clientWidth;
+            canvas.height = contenedor.clientHeight;
+            totalFiguras = 0; // Reiniciar contador en cada renderizado
+            dibujarEscena();
+      }
 
-        // Redibujamos todo
-        dibujarEscenaCompleta();
-    }
+      window.addEventListener('resize', redimensionarCanvas);
 
-    // Escuchamos el evento de cambio de tamaño de ventana
-    window.addEventListener('resize', redimensionarCanvas);
+      /**
+             * 1. FONDO: CIELO, MAR Y ARENA
+             * Figuras: 3 rectángulos + N líneas de oleaje
+       */
+      function dibujarFondo(w, h) {
+            // Cielo
+            ctx.fillStyle = '#bde0fe';
+            ctx.fillRect(0, 0, w, h * 0.7);
+            totalFiguras++;
 
-    // 2. Funciones de Dibujo (Organizadas por Elementos)
+            // Mar
+            ctx.fillStyle = '#2A82C5';
+            ctx.fillRect(0, h * 0.7, w, h * 0.15);
+            totalFiguras++;
 
-    function dibujarEscenaCompleta() {
-        if (!ctx) return;
-        const w = canvas.width;
-        const h = canvas.height;
+            // Arena (Playa inferior)
+            ctx.fillStyle = '#E3C18A';
+            ctx.fillRect(0, h * 0.85, w, h * 0.15);
+            totalFiguras++;
 
-        // Limpiamos el canvas
-        ctx.clearRect(0, 0, w, h);
+            // Detalle de olas (Zig-zag) - Aproximadamente 10-15 segmentos de línea
+            ctx.beginPath();
+            ctx.strokeStyle = '#1D5D8C';
+            ctx.lineWidth = 2;
+            let step = w / 20;
+            ctx.moveTo(0, h * 0.7);
+            for (let i = 0; i <= 20; i++) {
+                  let x = i * step;
+                  let y = (i % 2 === 0) ? h * 0.7 : h * 0.7 + 10;
+                  ctx.lineTo(x, y);
+                  totalFiguras++; // Cada segmento cuenta como una figura de línea
+            }
+            ctx.stroke();
+      }
 
-        // Definimos las capas de profundidad (Cielo -> Mar -> Elementos)
-        const altoCielo = h * 0.8;
-        const altoMar = h * 0.2;
+      /**
+             * 2. ELEMENTOS CELESTES: SOL Y NUBES
+             * Figuras: 1 arco (Sol) + 15 arcos (Nubes)
+       */
+      function dibujarSol(w, h) {
+            ctx.beginPath();
+            ctx.arc(w * 0.2, h * 0.15, h * 0.07, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD700';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.stroke();
+            totalFiguras++;
+      }
 
-        dibujarFondoYMar(w, altoCielo, altoMar);
-        dibujarSol(w, h);
-        dibujarNubes(w, h);
-        dibujarPajaros(w, h);
-        dibujarBarcos(w, h);
-    }
+      function crearNube(x, y, scale) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            
+            // Diseño de nube minimalista (3 círculos limpios)
+            const radios = [20 * scale, 25 * scale, 20 * scale];
+            const offsets = [0, 20 * scale, 40 * scale];
 
-    // --- Esto forma el Cielo y el Mar ---
-    function dibujarFondoYMar(w, altoCielo, altoMar) {
-        // Cielo (Fondo claro)
-        ctx.fillStyle = '#bde0fe'; // Un azul cielo claro minimalista
-        ctx.fillRect(0, 0, w, altoCielo);
+            radios.forEach((r, i) => {
+                  ctx.beginPath();
+                  ctx.arc(x + offsets[i], y, r, 0, Math.PI * 2);
+                  ctx.fill();
+                  ctx.stroke();
+                  totalFiguras++;
+            });
+      }
 
-        // Mar (Parte inferior)
-        ctx.fillStyle = '#0077b6'; // Un azul mar intenso
-        ctx.fillRect(0, altoCielo, w, altoMar);
+      /**
+             * 3. FAUNA: PÁJAROS
+             * Figuras: 10 líneas (5 pájaros)
+       */
+      function dibujarPajaros(w, h) {
+            const posiciones = [[0.3, 0.3], [0.45, 0.35], [0.7, 0.2], [0.8, 0.4], [0.9, 0.25]];
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
 
-        // Detalle de olas (línea en zig-zag)
-        ctx.beginPath();
-        ctx.strokeStyle = '#005f90'; // Un tono más oscuro
-        ctx.lineWidth = 1;
-        
-        const pasoZigZag = 20;
-        const altoZigZag = 10;
-        const yBase = altoCielo;
+            posiciones.forEach(p => {
+                  let px = w * p[0];
+                  let py = h * p[1];
+                  ctx.beginPath();
+                  ctx.moveTo(px, py);
+                  ctx.lineTo(px + 10, py + 5); // Ala 1
+                  ctx.lineTo(px + 20, py);     // Ala 2
+                  ctx.stroke();
+                  totalFiguras += 2;
+            });
+      }
 
-        ctx.moveTo(0, yBase);
-        for (let x = 0; x <= w; x += pasoZigZag) {
-            ctx.lineTo(x + pasoZigZag / 2, yBase + altoZigZag);
-            ctx.lineTo(x + pasoZigZag, yBase);
-        }
-        ctx.stroke();
-    }
+      /**
+             * 4. TRANSPORTE: BARCOS
+             * Figuras: 3 trapecios (cascos) + 3 líneas (mástiles) + 6 triángulos (velas)
+       */
+      function dibujarBarco(x, y, s) {
+            // Casco
+            ctx.fillStyle = '#6D4C41';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + 80 * s, y);
+            ctx.lineTo(x + 65 * s, y + 20 * s);
+            ctx.lineTo(x + 15 * s, y + 20 * s);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            totalFiguras++;
 
-    // --- Esto forma el Sol ---
-    function dibujarSol(w, h) {
-        // Posición y tamaño relativos
-        const solX = w * 0.25;
-        const solY = h * 0.15;
-        const radioSol = h * 0.08;
+            // Mástil
+            ctx.beginPath();
+            ctx.moveTo(x + 40 * s, y);
+            ctx.lineTo(x + 40 * s, y - 60 * s);
+            ctx.stroke();
+            totalFiguras++;
 
-        ctx.beginPath();
-        ctx.arc(solX, solY, radioSol, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffeb3b'; // Amarillo vibrante minimalista
-        ctx.strokeStyle = '#333'; // Borde oscuro minimalista
-        ctx.lineWidth = 2;
-        ctx.fill();
-        ctx.stroke();
-    }
+            // Velas
+            ctx.fillStyle = '#FFF';
+            // Vela Mayor
+            ctx.beginPath();
+            ctx.moveTo(x + 38 * s, y - 5);
+            ctx.lineTo(x + 38 * s, y - 55 * s);
+            ctx.lineTo(x + 5 * s, y - 10 * s);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            totalFiguras++;
 
-    // --- Esto forma las Nubes ---
-    function dibujarUnaNube(x, y, escala) {
-        ctx.fillStyle = '#ffffff'; // Blanco puro
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        
-        // La nube está hecha de círculos solapados
-        const radio = 25 * escala;
-        ctx.arc(x, y, radio, 0, Math.PI * 2); // Círculo izquierdo
-        ctx.arc(x + 30 * escala, y - 10 * escala, radio + 5 * escala, 0, Math.PI * 2); // Centro arriba
-        ctx.arc(x + 30 * escala, y + 10 * escala, radio + 5 * escala, 0, Math.PI * 2); // Centro abajo
-        ctx.arc(x + 60 * escala, y, radio, 0, Math.PI * 2); // Círculo derecho
-        
-        ctx.fill();
-        ctx.stroke();
-    }
+            // Vela Menor
+            ctx.beginPath();
+            ctx.moveTo(x + 42 * s, y - 5);
+            ctx.lineTo(x + 42 * s, y - 40 * s);
+            ctx.lineTo(x + 70 * s, y - 10 * s);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            totalFiguras++;
+      }
 
-    function dibujarNubes(w, h) {
-        // Nube 1 (Izquierda)
-        dibujarUnaNube(w * 0.1, h * 0.25, h * 0.001);
-        // Nube 2 (Arriba Centro)
-        dibujarUnaNube(w * 0.45, h * 0.15, h * 0.001);
-        // Nube 3 (Abajo Centro)
-        dibujarUnaNube(w * 0.6, h * 0.28, h * 0.001);
-        // Nube 4 (Arriba Derecha)
-        dibujarUnaNube(w * 0.75, h * 0.15, h * 0.001);
-        // Nube 5 (Abajo Derecha)
-        dibujarUnaNube(w * 0.9, h * 0.28, h * 0.001);
-    }
+      function dibujarEscena() {
+            const w = canvas.width;
+            const h = canvas.height;
 
-    // --- Esto forma las Pajaros (V-shapes) ---
-    function dibujarUnPajaro(x, y, ancho, alto) {
-        ctx.beginPath();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1.5;
-        ctx.moveTo(x, y); // Punta izquierda
-        ctx.lineTo(x + ancho / 2, y + alto); // Vértice abajo
-        ctx.lineTo(x + ancho, y); // Punta derecha
-        ctx.stroke();
-    }
+            dibujarFondo(w, h); // ~23 figuras
+            dibujarSol(w, h);   // 1 figura
+            dibujarPajaros(w, h); // 10 figuras
+            
+            // Nubes (5 nubes * 3 círculos = 15 figuras)
+            crearNube(w * 0.4, h * 0.1, 1);
+            crearNube(w * 0.65, h * 0.2, 0.8);
+            crearNube(w * 0.85, h * 0.15, 1.1);
+            crearNube(w * 0.1, h * 0.25, 0.7);
+            crearNube(w * 0.55, h * 0.05, 0.9);
 
-    function dibujarPajaros(w, h) {
-        const tamBaseAncho = w * 0.03;
-        const tamBaseAlto = h * 0.02;
+            // Barcos (3 barcos * 4 figuras = 12 figuras)
+            dibujarBarco(w * 0.15, h * 0.78, 1.2);
+            dibujarBarco(w * 0.5, h * 0.75, 1.5);
+            dibujarBarco(w * 0.8, h * 0.77, 1);
 
-        // Unos pocos pájaros esparcidos
-        dibujarUnPajaro(w * 0.35, h * 0.3, tamBaseAncho, tamBaseAlto);
-        dibujarUnPajaro(w * 0.3, h * 0.4, tamBaseAncho, tamBaseAlto);
-        dibujarUnPajaro(w * 0.45, h * 0.35, tamBaseAncho * 1.2, tamBaseAlto * 1.2);
-        dibujarUnPajaro(w * 0.7, h * 0.4, tamBaseAncho, tamBaseAlto);
-        dibujarUnPajaro(w * 0.8, h * 0.32, tamBaseAncho * 0.8, tamBaseAlto * 0.8);
-        dibujarUnPajaro(w * 0.93, h * 0.4, tamBaseAncho, tamBaseAlto);
-        dibujarUnPajaro(w * 0.07, h * 0.4, tamBaseAncho, tamBaseAlto);
-    }
+            console.log("Total de figuras básicas renderizadas: " + totalFiguras);
+      }
 
-    // --- Esto forma un Barco ---
-    function dibujarUnBarco(x, y, escala, colorCasco) {
-        const anchoVela = 60 * escala;
-        const altoVela = 100 * escala;
-        const anchoCasco = 120 * escala;
-        const altoCasco = 25 * escala;
-
-        // Casco (Trapecio)
-        ctx.fillStyle = colorCasco; // Un marrón
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x, y); // Esquina superior izquierda
-        ctx.lineTo(x + anchoCasco, y); // Esquina superior derecha
-        ctx.lineTo(x + anchoCasco - anchoCasco * 0.15, y + altoCasco); // Esquina inferior derecha
-        ctx.lineTo(x + anchoCasco * 0.15, y + altoCasco); // Esquina inferior izquierda
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Mástil
-        const mastilX = x + anchoVela;
-        ctx.beginPath();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 3;
-        ctx.moveTo(mastilX, y); // Base mástil
-        ctx.lineTo(mastilX, y - altoVela); // Punta mástil
-        ctx.stroke();
-
-        // Velas (Dos triángulos)
-        ctx.fillStyle = '#ffffff'; // Velas blancas
-        
-        // Vela izquierda
-        ctx.beginPath();
-        ctx.moveTo(mastilX - 2, y); // Base junto al mástil
-        ctx.lineTo(mastilX - anchoVela + 5, y - altoVela / 10); // Punta izquierda
-        ctx.lineTo(mastilX - 2, y - altoVela * 0.9); // Punta superior junto al mástil
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        // Vela derecha
-        ctx.beginPath();
-        ctx.moveTo(mastilX + 2, y); // Base junto al mástil
-        ctx.lineTo(mastilX + anchoVela - 20, y - altoVela / 10); // Punta derecha
-        ctx.lineTo(mastilX + 2, y - altoVela * 0.5); // Punta superior junto al mástil
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-    }
-
-    function dibujarBarcos(w, h) {
-        const yBase = h * 0.8;
-        const marronCasco = '#8d6e63'; // Un tono marrón minimalista
-
-        // Barco 1 (Izquierda)
-        dibujarUnBarco(w * 0.15, yBase, h * 0.0012, marronCasco);
-        // Barco 2 (Centro - más grande)
-        dibujarUnBarco(w * 0.45, yBase, h * 0.0018, marronCasco);
-        // Barco 3 (Derecha - más pequeño y más lejos)
-        dibujarUnBarco(w * 0.78, yBase, h * 0.001, marronCasco);
-    }
-
-    // 3. Inicialización
-    // Un pequeño retraso para asegurar que Bootstrap ha calculado los tamaños
-    setTimeout(redimensionarCanvas, 100);
+      setTimeout(redimensionarCanvas, 100);
 });
