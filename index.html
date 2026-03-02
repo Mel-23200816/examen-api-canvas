@@ -10,11 +10,16 @@
     
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
-<body class="bg-light d-flex flex-column vh-100">
+<body class="d-flex flex-column vh-100 fondo-minimalista">
 
-    <header class="bg-primary text-white text-center py-3 shadow-sm">
-        <h1 class="display-6 fw-semibold mb-0">Examen API Canvas</h1>
-    </header>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm border-bottom py-3">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand fw-semibold text-dark mb-0 h1">Examen API Canvas</span>
+            <div class="ms-auto text-end text-secondary small fw-medium">
+                Instituto Tecnológico de Pachuca | 6to Semestre
+            </div>
+        </div>
+    </nav>
 
     <main class="container-fluid flex-grow-1 p-4 d-flex">
         <div class="row w-100 g-4 m-0">
@@ -28,13 +33,21 @@
             </div>
 
             <div class="col-12 col-md-6 d-flex flex-column">
-                <div class="card shadow-sm border-0 rounded-4 flex-grow-1 overflow-hidden bg-dark">
-                    <img src="./assets/img/imagen.png" alt="Imagen de referencia" class="imagen-cobertura">
+                <div class="card shadow-sm border-0 rounded-4 flex-grow-1 overflow-hidden contenedor-imagen-bg">
+                    <img src="./assets/img/imagen.png" alt="Imagen de referencia" class="imagen-ajustada">
                 </div>
             </div>
 
         </div>
     </main>
+
+    <footer class="bg-white text-center py-3 shadow-sm mt-auto border-top">
+        <div class="container">
+            <p class="mb-0 text-secondary fw-medium small">
+                Miguel Angel Cano Alejandro | Ingeniería en Sistemas Computacionales | No. de Control: 23200816
+            </p>
+        </div>
+    </footer>
 
     <script src="./assets/js/main.js"></script>
 </body>
