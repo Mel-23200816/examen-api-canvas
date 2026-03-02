@@ -3,7 +3,7 @@
 Este proyecto consiste en la creación de una interfaz web moderna y minimalista que utiliza la **API de Canvas** de HTML5 para renderizar un paisaje marino dinámico. El desarrollo integra **Bootstrap 5** para el diseño responsivo, **CSS3** para el estilo visual y **JavaScript** para la lógica de dibujo técnica.
 
 ## 📝 Datos del Desarrollador
-* **Nombre:** [Tu Nombre Completo]
+* **Nombre:** Miguel Angel Cano Alejandro
 * **Carrera:** Ingeniería en Sistemas Computacionales
 * **Número de Control:** 23200816
 * **Institución:** Instituto Tecnológico de Pachuca
